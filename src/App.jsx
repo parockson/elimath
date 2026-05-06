@@ -20,6 +20,22 @@ const ELIModal = ({ isOpen, title, message, onClose, type }) => {
   );
 };
 
+// --- Shape Visualizer ---
+const ShapeVisuals = ({ type }) => {
+  const arrow = <span style={{fontSize: '1.5rem', color: '#94a3b8', margin: '0 15px'}}>➔</span>;
+  const Rect = () => <div style={{width: '60px', height: '40px', border: '3px solid #3d3282', borderRadius: '4px', background: '#e0e7ff'}}></div>;
+  const Square = () => <div style={{width: '50px', height: '50px', background: '#3d3282', borderRadius: '4px'}}></div>;
+  const Circle = () => <div style={{width: '55px', height: '55px', border: '4px solid #eab308', borderRadius: '50%', background: '#fef08a'}}></div>;
+  
+  return (
+    <div style={{display: 'flex', alignItems: 'center', marginBottom: '25px'}}>
+      {type === 1 && <><Rect/>{arrow}<Square/></>}
+      {type === 2 && <><Square/>{arrow}<Circle/></>}
+      {type === 3 && <><Rect/>{arrow}<Square/>{arrow}<Circle/></>}
+    </div>
+  );
+};
+
 // --- Test Form Component ---
 const TestForm = ({ stageNumber, onComplete, isFinal, loading }) => {
   const [step, setStep] = useState(1);
@@ -57,51 +73,52 @@ const TestForm = ({ stageNumber, onComplete, isFinal, loading }) => {
 
   return (
     <div className="card shadow-md">
-      <div className="part-label" style={{fontWeight: 800, color: '#64748b', fontSize: '0.9rem', marginBottom: '10px'}}>
+      <div className="part-label">
         STAGE {isPre ? 'ONE: Pre-Test' : 'THREE: Post-Test'}
       </div>
-      <h2 style={{marginTop: 0, marginBottom: '25px', color: '#221b4c', fontSize: '1.4rem'}}>
+      <h2>
         Question A: Describe how you would transform a rectangle into a square and then into a circle.
       </h2>
       <form onSubmit={handleNext}>
         {step === 1 && (
           <section className="animate-fade-in">
-            <h3 className="part-title" style={{color: '#3d3282', borderBottom: '2px solid #f1f5f9', paddingBottom: '10px'}}>Part 1: Rectangle → Square</h3>
-            <p className="instruction" style={{color: '#334155', marginBottom: '25px'}}>The first part of your response should focus on transforming a rectangle into a square. Write your response under each of these themes:</p>
+            <h3 className="part-title">Part 1: Rectangle → Square</h3>
+            <p className="instruction">The first part of your response should focus on transforming a rectangle into a square. Write your response under each of these themes:</p>
+            <ShapeVisuals type={1} />
             
-            <div className="theme-block" style={{marginBottom: '30px'}}>
-              <h4 style={{color: '#221b4c', marginBottom: '15px'}}>{qNum.p1_parts}. Identify which part(s) of the rectangle you will focus on.</h4>
+            <div className="theme-block">
+              <h4>{qNum.p1_parts}. Identify which part(s) of the rectangle you will focus on.</h4>
               {letters.part1.map(l => (
-                <div key={l} className="input-row" style={{marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '5px'}}>
-                  <label style={{fontWeight: 600, fontSize: '0.9rem'}}>{l}. Name of the Part (e.g., vertex, side, or angle):</label>
-                  <input type="text" required onChange={e => update(`p1_part_${l}`, e.target.value)} style={{padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1'}} />
+                <div key={l} className="input-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '5px', marginBottom: '15px' }}>
+                  <label>{l}. Name of the Part (e.g., vertex, side, or angle):</label>
+                  <input type="text" required onChange={e => update(`p1_part_${l}`, e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontFamily: 'inherit' }} />
                 </div>
               ))}
             </div>
 
-            <div className="theme-block" style={{marginBottom: '30px'}}>
-              <h4 style={{color: '#221b4c', marginBottom: '15px'}}>{qNum.p1_changes}. Explain the exact change you would make to each part so that the rectangle becomes a square.</h4>
+            <div className="theme-block">
+              <h4>{qNum.p1_changes}. Explain the exact change you would make to each part so that the rectangle becomes a square.</h4>
               {letters.part1.map(l => (
-                <div key={l} className="input-row" style={{marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '5px'}}>
-                  <label style={{fontWeight: 600, fontSize: '0.9rem'}}>{l}. Description of the change:</label>
-                  <input type="text" required onChange={e => update(`p1_change_${l}`, e.target.value)} style={{padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1'}} />
+                <div key={l} className="input-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '5px', marginBottom: '15px' }}>
+                  <label>{l}. Description of the change:</label>
+                  <textarea required rows="2" onChange={e => update(`p1_change_${l}`, e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontFamily: 'inherit', resize: 'vertical' }} />
                 </div>
               ))}
             </div>
 
-            <div className="theme-block" style={{marginBottom: '30px'}}>
-              <h4 style={{color: '#221b4c', marginBottom: '15px'}}>{qNum.p1_ai}. Identify moments in your process where reasoning similar to an AI concept appears.</h4>
+            <div className="theme-block">
+              <h4>{qNum.p1_ai}. Identify moments in your process where reasoning similar to an AI concept appears.</h4>
               {letters.p1_ai.map(l => (
-                <div key={l} className="input-row" style={{marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '5px'}}>
-                  <label style={{fontWeight: 600, fontSize: '0.9rem'}}>{l}. Part, change made, and AI concept:</label>
-                  <input type="text" required onChange={e => update(`p1_ai_${l}`, e.target.value)} style={{padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1'}} />
+                <div key={l} className="input-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '5px', marginBottom: '15px' }}>
+                  <label>{l}. Part, change made, and AI concept:</label>
+                  <textarea required rows="2" onChange={e => update(`p1_ai_${l}`, e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontFamily: 'inherit', resize: 'vertical' }} />
                 </div>
               ))}
             </div>
 
-            <div className="theme-block" style={{marginBottom: '30px'}}>
-              <h4 style={{color: '#221b4c', marginBottom: '15px'}}>{qNum.p1_narrative}. Combine your responses above into a short narrative explaining how you transformed the rectangle into a square and the AI-related reasoning that emerged during the process.</h4>
-              <textarea required rows="4" onChange={e => update('p1_narrative', e.target.value)} style={{width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box'}} />
+            <div className="theme-block">
+              <h4>{qNum.p1_narrative}. Combine your responses above into a short narrative explaining how you transformed the rectangle into a square and the AI-related reasoning that emerged during the process.</h4>
+              <textarea required rows="4" onChange={e => update('p1_narrative', e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontFamily: 'inherit', resize: 'vertical' }} />
             </div>
 
             <button type="submit" className="btn-primary">Next: Part 2</button>
@@ -110,42 +127,43 @@ const TestForm = ({ stageNumber, onComplete, isFinal, loading }) => {
 
         {step === 2 && (
           <section className="animate-fade-in">
-            <h3 className="part-title" style={{color: '#3d3282', borderBottom: '2px solid #f1f5f9', paddingBottom: '10px'}}>Part 2: Square → Circle</h3>
-            <p className="instruction" style={{color: '#334155', marginBottom: '25px'}}>The second part of your response should focus on transforming a square into a circle. Write your response under each of these themes:</p>
+            <h3 className="part-title">Part 2: Square → Circle</h3>
+            <p className="instruction">The second part of your response should focus on transforming a square into a circle. Write your response under each of these themes:</p>
+            <ShapeVisuals type={2} />
             
-            <div className="theme-block" style={{marginBottom: '30px'}}>
-              <h4 style={{color: '#221b4c', marginBottom: '15px'}}>{qNum.p2_parts}. Identify which part(s) of the square you will focus on.</h4>
+            <div className="theme-block">
+              <h4>{qNum.p2_parts}. Identify which part(s) of the square you will focus on.</h4>
               {letters.part2.map(l => (
-                <div key={l} className="input-row" style={{marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '5px'}}>
-                  <label style={{fontWeight: 600, fontSize: '0.9rem'}}>{l}. Name of the Part (e.g., vertex, side, or angle):</label>
-                  <input type="text" required onChange={e => update(`p2_part_${l}`, e.target.value)} style={{padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1'}} />
+                <div key={l} className="input-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '5px', marginBottom: '15px' }}>
+                  <label>{l}. Name of the Part (e.g., vertex, side, or angle):</label>
+                  <input type="text" required onChange={e => update(`p2_part_${l}`, e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontFamily: 'inherit' }} />
                 </div>
               ))}
             </div>
 
-            <div className="theme-block" style={{marginBottom: '30px'}}>
-              <h4 style={{color: '#221b4c', marginBottom: '15px'}}>{qNum.p2_changes}. Explain the exact change you would make to each part so that the square becomes a circle.</h4>
+            <div className="theme-block">
+              <h4>{qNum.p2_changes}. Explain the exact change you would make to each part so that the square becomes a circle.</h4>
               {letters.part2.map(l => (
-                <div key={l} className="input-row" style={{marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '5px'}}>
-                  <label style={{fontWeight: 600, fontSize: '0.9rem'}}>{l}. Description of the change:</label>
-                  <input type="text" required onChange={e => update(`p2_change_${l}`, e.target.value)} style={{padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1'}} />
+                <div key={l} className="input-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '5px', marginBottom: '15px' }}>
+                  <label>{l}. Description of the change:</label>
+                  <textarea required rows="2" onChange={e => update(`p2_change_${l}`, e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontFamily: 'inherit', resize: 'vertical' }} />
                 </div>
               ))}
             </div>
 
-            <div className="theme-block" style={{marginBottom: '30px'}}>
-              <h4 style={{color: '#221b4c', marginBottom: '15px'}}>{qNum.p2_ai}. Identify moments in your process where reasoning similar to an AI concept appears.</h4>
+            <div className="theme-block">
+              <h4>{qNum.p2_ai}. Identify moments in your process where reasoning similar to an AI concept appears.</h4>
               {letters.p2_ai.map(l => (
-                <div key={l} className="input-row" style={{marginBottom: '12px', display: 'flex', flexDirection: 'column', gap: '5px'}}>
-                  <label style={{fontWeight: 600, fontSize: '0.9rem'}}>{l}. Part, change made, and AI concept:</label>
-                  <input type="text" required onChange={e => update(`p2_ai_${l}`, e.target.value)} style={{padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1'}} />
+                <div key={l} className="input-row" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '5px', marginBottom: '15px' }}>
+                  <label>{l}. Part, change made, and AI concept:</label>
+                  <textarea required rows="2" onChange={e => update(`p2_ai_${l}`, e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontFamily: 'inherit', resize: 'vertical' }} />
                 </div>
               ))}
             </div>
 
-            <div className="theme-block" style={{marginBottom: '30px'}}>
-              <h4 style={{color: '#221b4c', marginBottom: '15px'}}>{qNum.p2_narrative}. Combine your responses above into a short narrative explaining how you transformed the square into a circle and the AI-related reasoning that emerged during the process.</h4>
-              <textarea required rows="4" onChange={e => update('p2_narrative', e.target.value)} style={{width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box'}} />
+            <div className="theme-block">
+              <h4>{qNum.p2_narrative}. Combine your responses above into a short narrative explaining how you transformed the square into a circle and the AI-related reasoning that emerged during the process.</h4>
+              <textarea required rows="4" onChange={e => update('p2_narrative', e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontFamily: 'inherit', resize: 'vertical' }} />
             </div>
 
             <button type="submit" className="btn-primary">Next: Part 3</button>
@@ -154,14 +172,15 @@ const TestForm = ({ stageNumber, onComplete, isFinal, loading }) => {
 
         {step === 3 && (
           <section className="animate-fade-in">
-            <h3 className="part-title" style={{color: '#3d3282', borderBottom: '2px solid #f1f5f9', paddingBottom: '10px'}}>Part 3: Rectangle → Square → Circle</h3>
-            <div className="theme-block" style={{marginBottom: '30px'}}>
-              <h4 style={{color: '#221b4c', marginBottom: '15px', lineHeight: '1.5'}}>{qNum.p3_final}. Bring your responses in {qNum.p1_narrative} and {qNum.p2_narrative} together to write a narrative which details how you transformed a rectangle into a square and then into a circle and the AI concepts that emerged at instances of each transformation.</h4>
-              <textarea required rows="8" onChange={e => update('final_narrative', e.target.value)} style={{width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box'}} />
+            <h3 className="part-title">Part 3: Rectangle → Square → Circle</h3>
+            <ShapeVisuals type={3} />
+            <div className="theme-block">
+              <h4>{qNum.p3_final}. Bring your responses in {qNum.p1_narrative} and {qNum.p2_narrative} together to write a narrative which details how you transformed a rectangle into a square and then into a circle and the AI concepts that emerged at instances of each transformation.</h4>
+              <textarea required rows="8" onChange={e => update('final_narrative', e.target.value)} style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontFamily: 'inherit', resize: 'vertical' }} />
             </div>
             
             {isFinal && (
-              <div className="final-notice" style={{marginBottom: '20px', padding: '15px', backgroundColor: '#fef3c7', color: '#92400e', borderRadius: '8px', border: '1px solid #fcd34d', textAlign: 'center'}}>
+              <div className="final-notice">
                 Submit to: <strong>Mathematicselithermos@gmail.com</strong>
               </div>
             )}
@@ -178,12 +197,12 @@ export default function App() {
   const [fullName, setFullName] = useState('');
   const [preTestData, setPreTestData] = useState({});
   const [eliTimer, setEliTimer] = useState(0);
-  const [modals, setModals] = useState({ id: false, lock: false, info: false, ded: false });
+  const [modals, setModals] = useState({ id: false, lock: false, ded: false });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let interval;
-    if (stage === 2 && eliTimer < 180) interval = setInterval(() => setEliTimer(t => t + 1), 1000);
+    if (stage === 2 && eliTimer < 60) interval = setInterval(() => setEliTimer(t => t + 1), 1000);
     return () => clearInterval(interval);
   }, [stage, eliTimer]);
 
@@ -212,17 +231,13 @@ export default function App() {
       <ELIModal isOpen={modals.id} title="Identification Required" message={<p>Please enter your Full Name to proceed.</p>} onClose={() => toggleModal('id', false)} type="profile" />
       <ELIModal isOpen={modals.lock} title="Access Locked" message={<p>You are now moving to Stage 3. You cannot return.</p>} onClose={() => toggleModal('lock', false)} type="warning" />
       
-      <ELIModal isOpen={modals.info} title="Information Section" onClose={() => toggleModal('info', false)} type="info" message={
-        <div className="rich-text">
-          <p>Every day, our bodies quietly respond to the temperature around us. This response is shaped by the relationship between our internal body temperature and the temperature of the external environment...</p>
-          <p><strong>ELI</strong> is a biomimicry-based interactive learning environment designed to help you explore these questions. Through eight engaging lessons, you will build an understanding of how nature’s solutions can inspire scientific thinking.</p>
-        </div>
-      } />
-      
-      <ELIModal isOpen={modals.ded} title="Science Education Interface Dedication" onClose={() => toggleModal('ded', false)} type="dedication" message={
+      <ELIModal isOpen={modals.ded} title="Mathematics Education Interface Dedication" onClose={() => toggleModal('ded', false)} type="dedication" message={
         <div className="rich-text scrollable">
-          <p>We dedicate this environment to the scholarship of <strong>Dr. Eli Tucker-Raymond</strong> of Boston University.</p>
-          <p>His mentorship has been a lifelong light, helping scholars from non-dominant groups establish recognition for their ways of knowing in science education.</p>
+          <p>We dedicate this Mathematics Education agent-based learning environment to the scholarship of <strong>Dr. Eli Tucker-Raymond</strong> of Boston University.</p>
+          <p>His mentorship has, methodologically, theoretically, empirically, and computationally, been a lifelong light that never dims within often onto-epistemologically endarkened academic spaces. These spaces have historically privileged and validated the ways of knowing of dominant groups as the primary context for mathematics education. Yet within these very spaces, often described as multicultural, scholars from non-dominant groups encounter deeply challenging paths as they work to establish recognition for their often taken-for-granted ways of knowing as rigorous, generative, and transformative approaches to learning mathematics.</p>
+          <p>Through his guidance, we have been able to critically and courageously engage taken-for-granted assumptions in mathematics education and reimagine them through inclusive, justice-oriented, and culturally grounded approaches. His work has inspired us to understand mathematical reasoning not as detached symbolic manipulation but as deeply connected to spatial reasoning, cultural practice, and the natural world.</p>
+          <p>This platform reflects that vision. It is grounded in African everyday practices, particularly weatherlore expressed through the altitudes at which birds fly and the corresponding states of the weather. In this system, bird movement across atmospheric layers is represented as structured configurations within a nine-dot rectangular array. As birds shift altitude in response to changing weather conditions, they are interpreted as restructuring their positions within this array, generating new geometric formations. These transformations allow learners to engage in proving how a rectangular arrangement of nine dots can be systematically restructured into a geometric square and subsequently into a circle.</p>
+          <p>Through an automated theorem proving environment, learners are also invited to justify the mathematical and artificial intelligence concepts embedded within each step of structuring and restructuring. This includes reasoning about spatial transformation, constraint satisfaction, and formal proof construction as they relate to dynamic geometric change.</p>
           <p>In honor of his enduring influence, this platform proudly bears the name <strong>“ELI.”</strong></p>
         </div>
       } />
@@ -231,7 +246,6 @@ export default function App() {
         <div className="taskbar-content">
           <div className="brand" onClick={() => stage === 0 && setStage(0)}><div className="logo-sq" /> ELIMATH</div>
           <div className="nav-links">
-            <button className="text-link" onClick={() => toggleModal('info', true)}>Information</button>
             <button className="text-link" onClick={() => toggleModal('ded', true)}>Dedication</button>
           </div>
           <div className="nav-steps">
@@ -292,8 +306,8 @@ export default function App() {
             <h2>ELI Engagement</h2>
             <div className="timer-ui">{Math.floor(eliTimer/60)}:{(eliTimer%60).toString().padStart(2,'0')}</div>
             <div className="canvas-box">Interactive ELI Interface</div>
-            <button className="btn-primary" disabled={eliTimer < 180} onClick={() => { toggleModal('lock', true); setStage(3); }}>
-              {eliTimer < 180 ? `Wait to Unlock (${180 - eliTimer}s)` : 'Unlock Stage 3'}
+            <button className="btn-primary" disabled={eliTimer < 60} onClick={() => { toggleModal('lock', true); setStage(3); }}>
+              {eliTimer < 60 ? `Wait to Unlock (${60 - eliTimer}s)` : 'Unlock Stage 3'}
             </button>
           </div>
         )}
