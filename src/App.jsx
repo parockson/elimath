@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './styles/App.scss';
+import ELIInterface from './components/Stages/ELIInterface';
 
 // --- Reusable Modal Component ---
 const ELIModal = ({ isOpen, title, message, onClose, type }) => {
@@ -21,14 +22,14 @@ const ELIModal = ({ isOpen, title, message, onClose, type }) => {
 };
 
 // --- Shape Visualizer ---
-const ShapeVisuals = ({ type }) => {
-  const arrow = <span style={{fontSize: '1.5rem', color: '#94a3b8', margin: '0 15px'}}>➔</span>;
-  const Rect = () => <div style={{width: '60px', height: '40px', border: '3px solid #3d3282', borderRadius: '4px', background: '#e0e7ff'}}></div>;
-  const Square = () => <div style={{width: '50px', height: '50px', background: '#3d3282', borderRadius: '4px'}}></div>;
-  const Circle = () => <div style={{width: '55px', height: '55px', border: '4px solid #eab308', borderRadius: '50%', background: '#fef08a'}}></div>;
+const ShapeVisuals = ({ type, scale = 1 }) => {
+  const arrow = <span style={{fontSize: (1.5 * scale) + 'rem', color: '#94a3b8', margin: '0 ' + (15 * scale) + 'px'}}>➔</span>;
+  const Rect = () => <div style={{width: (60 * scale) + 'px', height: (40 * scale) + 'px', border: (3 * scale) + 'px solid #dc2626', borderRadius: (4 * scale) + 'px', background: '#fee2e2'}}></div>;
+  const Square = () => <div style={{width: (50 * scale) + 'px', height: (50 * scale) + 'px', background: '#dc2626', borderRadius: (4 * scale) + 'px'}}></div>;
+  const Circle = () => <div style={{width: (55 * scale) + 'px', height: (55 * scale) + 'px', border: (4 * scale) + 'px solid #eab308', borderRadius: '50%', background: '#fef08a'}}></div>;
   
   return (
-    <div style={{display: 'flex', alignItems: 'center', marginBottom: '25px'}}>
+    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '25px'}}>
       {type === 1 && <><Rect/>{arrow}<Square/></>}
       {type === 2 && <><Square/>{arrow}<Circle/></>}
       {type === 3 && <><Rect/>{arrow}<Square/>{arrow}<Circle/></>}
@@ -244,7 +245,23 @@ export default function App() {
 
       <nav className="taskbar">
         <div className="taskbar-content">
-          <div className="brand" onClick={() => stage === 0 && setStage(0)}><div className="logo-sq" /> ELIMATH</div>
+          <div 
+            className="brand" 
+            onClick={() => stage === 0 && setStage(0)}
+            onDoubleClick={() => {
+              if (stage === 0) { setFullName("Test User"); setStage(1); }
+              else if (stage === 1) { setPreTestData({ skipped: true }); setStage(2); }
+              else if (stage === 2) { setStage(3); }
+              else if (stage === 3) { 
+                setLoading(true);
+                setTimeout(() => { setLoading(false); setStage(4); }, 500);
+              }
+            }}
+            title="Double-click to skip stage (Cheat)"
+            style={{ userSelect: 'none' }}
+          >
+            <div className="logo-sq" /> ELIMATH
+          </div>
           <div className="nav-links">
             <button className="text-link" onClick={() => toggleModal('ded', true)}>Dedication</button>
           </div>
@@ -256,7 +273,7 @@ export default function App() {
         </div>
       </nav>
 
-      <div className="container">
+      <div className={`container ${stage === 2 ? 'wide' : ''}`}>
         {stage === 0 && (
           <div className="home-hero animate-fade-in">
             <div className="hero-content">
@@ -264,6 +281,8 @@ export default function App() {
               <h1 className="hero-title">Automated Theorem Prover <br/><span className="gradient-text">Learning Environment</span></h1>
               <p className="hero-subtitle">Engage with ELI through a structured three-part process designed to build your understanding of mathematical proofs and scientific thinking.</p>
               
+              <ShapeVisuals type={3} scale={1.8} />
+
               <div className="process-steps">
                 <div className="process-step">
                   <div className="step-icon">1</div>
@@ -302,14 +321,7 @@ export default function App() {
         )}
         {stage === 1 && <TestForm stageNumber={1} onComplete={(d) => { setPreTestData(d); setStage(2); }} />}
         {stage === 2 && (
-          <div className="card animate-fade-in text-center">
-            <h2>ELI Engagement</h2>
-            <div className="timer-ui">{Math.floor(eliTimer/60)}:{(eliTimer%60).toString().padStart(2,'0')}</div>
-            <div className="canvas-box">Interactive ELI Interface</div>
-            <button className="btn-primary" disabled={eliTimer < 60} onClick={() => { toggleModal('lock', true); setStage(3); }}>
-              {eliTimer < 60 ? `Wait to Unlock (${60 - eliTimer}s)` : 'Unlock Stage 3'}
-            </button>
-          </div>
+          <ELIInterface timer={eliTimer} onComplete={() => { toggleModal('lock', true); setStage(3); }} />
         )}
         {stage === 3 && <TestForm stageNumber={3} onComplete={handleFinalSubmit} isFinal={true} loading={loading} />}
         {stage === 4 && <div className="card text-center"><h2 className="gradient-text">Submission Successful</h2><p>Thank you, {fullName}. Your data has been recorded.</p></div>}
