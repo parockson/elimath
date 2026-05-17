@@ -218,13 +218,27 @@ export default function App() {
   const handleFinalSubmit = async (postData) => {
     setLoading(true);
     try {
-      await fetch("https://formspree.io/f/YOUR_ID", {
+      const res = await fetch("https://formspree.io/f/mbdbjjay", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user: fullName, pre: preTestData, post: postData, timeSpent: eliTimer }),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          _subject: `ELIMATH submission — ${fullName}`,
+          user: fullName,
+          pre: preTestData,
+          post: postData,
+          timeSpent: eliTimer,
+        }),
       });
+      if (!res.ok) throw new Error("Formspree rejected the submission");
       setStage(4);
-    } catch { alert("Error."); } finally { setLoading(false); }
+    } catch {
+      alert("We could not send your responses. Please try again or contact Mathematicselithermos@gmail.com.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
