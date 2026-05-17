@@ -37,6 +37,75 @@ const ShapeVisuals = ({ type, scale = 1 }) => {
   );
 };
 
+const getTestFormMeta = (isPre) => ({
+  q: isPre
+    ? { p1_parts: 1, p1_changes: 2, p1_ai: 3, p1_narrative: 4, p2_parts: 5, p2_changes: 6, p2_ai: 7, p2_narrative: 8, p3_final: 9 }
+    : { p1_parts: 10, p1_changes: 11, p1_ai: 12, p1_narrative: 13, p2_parts: 14, p2_changes: 15, p2_ai: 16, p2_narrative: 17, p3_final: 18 },
+  letters: {
+    part1: isPre ? ['a', 'b', 'c', 'd'] : ['i', 'j', 'k', 'l'],
+    p1_ai: isPre ? ['a', 'b'] : ['e', 'f'],
+    part2: isPre ? ['e', 'f', 'g', 'h'] : ['m', 'n', 'o', 'p'],
+    p2_ai: isPre ? ['c', 'd'] : ['g', 'h'],
+  },
+});
+
+const buildTestFieldLabelMap = (isPre) => {
+  const { q, letters } = getTestFormMeta(isPre);
+  const map = {};
+
+  letters.part1.forEach((l) => {
+    map[`p1_part_${l}`] = `Q${q.p1_parts}${l}. Identify which part(s) of the rectangle you will focus on. — ${l}. Name of the Part (e.g., vertex, side, or angle)`;
+    map[`p1_change_${l}`] = `Q${q.p1_changes}${l}. Explain the exact change you would make to each part so that the rectangle becomes a square. — ${l}. Description of the change`;
+  });
+  letters.p1_ai.forEach((l) => {
+    map[`p1_ai_${l}`] = `Q${q.p1_ai}${l}. Identify moments in your process where reasoning similar to an AI concept appears (Rectangle → Square). — ${l}. Part, change made, and AI concept`;
+  });
+  map.p1_narrative = `Q${q.p1_narrative}. Combine your responses above into a short narrative explaining how you transformed the rectangle into a square and the AI-related reasoning that emerged during the process.`;
+
+  letters.part2.forEach((l) => {
+    map[`p2_part_${l}`] = `Q${q.p2_parts}${l}. Identify which part(s) of the square you will focus on. — ${l}. Name of the Part (e.g., vertex, side, or angle)`;
+    map[`p2_change_${l}`] = `Q${q.p2_changes}${l}. Explain the exact change you would make to each part so that the square becomes a circle. — ${l}. Description of the change`;
+  });
+  letters.p2_ai.forEach((l) => {
+    map[`p2_ai_${l}`] = `Q${q.p2_ai}${l}. Identify moments in your process where reasoning similar to an AI concept appears (Square → Circle). — ${l}. Part, change made, and AI concept`;
+  });
+  map.p2_narrative = `Q${q.p2_narrative}. Combine your responses above into a short narrative explaining how you transformed the square into a circle and the AI-related reasoning that emerged during the process.`;
+  map.final_narrative = `Q${q.p3_final}. Bring your responses in Q${q.p1_narrative} and Q${q.p2_narrative} together to write a narrative which details how you transformed a rectangle into a square and then into a circle and the AI concepts that emerged at instances of each transformation.`;
+
+  return map;
+};
+
+const getTestFieldOrder = (isPre) => {
+  const { letters } = getTestFormMeta(isPre);
+  return [
+    ...letters.part1.map((l) => `p1_part_${l}`),
+    ...letters.part1.map((l) => `p1_change_${l}`),
+    ...letters.p1_ai.map((l) => `p1_ai_${l}`),
+    'p1_narrative',
+    ...letters.part2.map((l) => `p2_part_${l}`),
+    ...letters.part2.map((l) => `p2_change_${l}`),
+    ...letters.p2_ai.map((l) => `p2_ai_${l}`),
+    'p2_narrative',
+    'final_narrative',
+  ];
+};
+
+const formatTestResponsesForFormspree = (isPre, data) => {
+  const labelMap = buildTestFieldLabelMap(isPre);
+  const stageLabel = isPre ? 'Pre-Test' : 'Post-Test';
+  const out = {
+    [`${stageLabel} — Question A`]: 'Describe how you would transform a rectangle into a square and then into a circle.',
+  };
+
+  for (const key of getTestFieldOrder(isPre)) {
+    if (key in data) out[labelMap[key]] = data[key];
+  }
+  for (const [key, value] of Object.entries(data)) {
+    if (!getTestFieldOrder(isPre).includes(key)) out[labelMap[key] ?? key] = value;
+  }
+  return out;
+};
+
 // --- Test Form Component ---
 const TestForm = ({ stageNumber, onComplete, isFinal, loading }) => {
   const [step, setStep] = useState(1);
@@ -226,10 +295,10 @@ export default function App() {
         },
         body: JSON.stringify({
           _subject: `ELIMATH submission — ${fullName}`,
-          user: fullName,
-          pre: preTestData,
-          post: postData,
-          timeSpent: eliTimer,
+          participant: fullName,
+          eliStageTimeSeconds: eliTimer,
+          pre: formatTestResponsesForFormspree(true, preTestData),
+          post: formatTestResponsesForFormspree(false, postData),
         }),
       });
       if (!res.ok) throw new Error("Formspree rejected the submission");
