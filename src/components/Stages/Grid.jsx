@@ -29,6 +29,19 @@ Birds move one-by-one in this order per wave
 const AUTO_ORDER = ["A1", "C1", "E1", "A7", "C7", "E7"];
 const BIRD_DELAY_MS = 10000; // 10s between each individual bird move
 
+const VIEWBOX = { w: 800, h: 640 };
+const BIRD_SIZE = 56;
+const BIRD_ASSETS = {
+  rest: "/birds/bird-normal1.png",
+  flapA: "/birds/bird-flap11.png",
+  flapB: "/birds/bird-flap21.png",
+};
+
+const birdPosToPercent = ({ x, y }) => ({
+  left: `${(x / VIEWBOX.w) * 100}%`,
+  top: `${(y / VIEWBOX.h) * 100}%`,
+});
+
 /* ===============================
 GRID COMPONENT
 =============================== */
@@ -43,6 +56,7 @@ export default function Grid({ onBirdMove, weather = "Summer", autoMode = false,
   const videoRef      = useRef(null);
   const svgRef        = useRef(null);
   const dragStartNode = useRef(null);
+  const dragTargetRef = useRef(null);
   const autoTimers    = useRef([]);
 
   // Geometric constants
@@ -175,6 +189,7 @@ export default function Grid({ onBirdMove, weather = "Summer", autoMode = false,
       videoRef.current.play().catch(() => {});
     }
     dragStartNode.current = birdNodes[birdId];
+    dragTargetRef.current = e.currentTarget;
     setMovingBird(birdId);
     setDragPos(getSVGPos(e));
     e.currentTarget.setPointerCapture(e.pointerId);
@@ -209,24 +224,37 @@ export default function Grid({ onBirdMove, weather = "Summer", autoMode = false,
     }
 
     dragStartNode.current = null;
+    dragTargetRef.current?.releasePointerCapture?.(e.pointerId);
+    dragTargetRef.current = null;
     setMovingBird(null);
     setDragPos(null);
-    e.currentTarget.releasePointerCapture(e.pointerId);
   };
 
   /* ===============================
   RENDER
   =============================== */
-  const BIRD_SIZE = 56;
-  const BIRD_HALF = BIRD_SIZE / 2;
-
   const getBirdPos = (birdId) => {
     if (movingBird === birdId && dragPos) return dragPos;
     return allNodes[birdNodes[birdId]];
   };
 
+  const getBirdSrc = (isFlapping) => {
+    if (!isFlapping) return BIRD_ASSETS.rest;
+    return flapFrame === 0 ? BIRD_ASSETS.flapA : BIRD_ASSETS.flapB;
+  };
+
   return (
-    <div style={{ position: "relative", width: "100%", maxWidth: "800px", margin: "0 auto" }}>
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        maxWidth: "800px",
+        margin: "0 auto",
+        aspectRatio: `${VIEWBOX.w} / ${VIEWBOX.h}`,
+      }}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+    >
       {/* BACKGROUND VIDEO */}
       <video ref={videoRef} autoPlay loop muted playsInline style={{
         position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
@@ -248,13 +276,9 @@ export default function Grid({ onBirdMove, weather = "Summer", autoMode = false,
         zIndex: 2, pointerEvents: "none", transition: "background 1.5s ease"
       }} />
 
-      <svg ref={svgRef} viewBox="0 0 800 640" width="100%"
-        style={{ position: "relative", zIndex: 3, touchAction: "none" }}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
+      <svg ref={svgRef} viewBox={`0 0 ${VIEWBOX.w} ${VIEWBOX.h}`} width="100%" height="100%"
+        style={{ position: "absolute", inset: 0, zIndex: 3, touchAction: "none", pointerEvents: "none" }}
       >
-        {/* NO background rects here — SVG is fully transparent so birds show correctly */}
-
         {/* Outer polygon */}
         <polygon points={`${nodes.A1.x},${nodes.A1.y} ${nodes.E1.x},${nodes.E1.y} ${nodes.E7.x},${nodes.E7.y} ${nodes.A7.x},${nodes.A7.y}`}
           fill="none" stroke="#60a5fa" strokeWidth="2.5" opacity="0.9" />
@@ -282,31 +306,7 @@ export default function Grid({ onBirdMove, weather = "Summer", autoMode = false,
           );
         })}
 
-        {/* BIRDS — rendered before nodes so nodes dot on top */}
-        {initialBirdLabels.map((birdId) => {
-          const p = getBirdPos(birdId);
-          if (!p) return null;
-          const isFlapping = movingBird === birdId || currentlyFlying === birdId;
-          const hasPath    = !!birdPaths[birdId];
-          const birdImg    = isFlapping
-            ? (flapFrame === 0 ? "/birds/bird-flap11.png" : "/birds/bird-flap21.png")
-            : "/birds/bird-normal1.png";
-
-          return (
-            <image key={birdId}
-              href={birdImg}
-              x={p.x - BIRD_HALF} y={p.y - BIRD_HALF}
-              width={BIRD_SIZE} height={BIRD_SIZE}
-              style={{
-                cursor: hasPath && !autoMode ? (isFlapping ? "grabbing" : "grab") : "default",
-                pointerEvents: hasPath && !autoMode ? "all" : "none",
-              }}
-              onPointerDown={hasPath && !autoMode ? (e) => handlePointerDown(e, birdId) : undefined}
-            />
-          );
-        })}
-
-        {/* GRID NODES — on top of birds */}
+        {/* GRID NODES */}
         {Object.entries(nodes).map(([l, p]) => (
           <g key={l}>
             <circle cx={p.x} cy={p.y} r={5} fill={getNodeColor(l)} stroke="white" strokeWidth="1.5" />
@@ -322,6 +322,39 @@ export default function Grid({ onBirdMove, weather = "Summer", autoMode = false,
           </g>
         ))}
       </svg>
+
+      <div className="birds-layer" style={{ position: "absolute", inset: 0, zIndex: 4, pointerEvents: "none" }}>
+        {initialBirdLabels.map((birdId) => {
+          const p = getBirdPos(birdId);
+          if (!p) return null;
+          const isFlapping = movingBird === birdId || currentlyFlying === birdId;
+          const hasPath = !!birdPaths[birdId];
+          const pos = birdPosToPercent(p);
+
+          return (
+            <img
+              key={birdId}
+              src={getBirdSrc(isFlapping)}
+              alt=""
+              draggable={false}
+              style={{
+                position: "absolute",
+                left: pos.left,
+                top: pos.top,
+                width: `${(BIRD_SIZE / VIEWBOX.w) * 100}%`,
+                height: "auto",
+                transform: "translate(-50%, -50%)",
+                mixBlendMode: "screen",
+                cursor: hasPath && !autoMode ? (isFlapping ? "grabbing" : "grab") : "default",
+                pointerEvents: hasPath && !autoMode ? "auto" : "none",
+                userSelect: "none",
+                touchAction: "none",
+              }}
+              onPointerDown={hasPath && !autoMode ? (e) => handlePointerDown(e, birdId) : undefined}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }

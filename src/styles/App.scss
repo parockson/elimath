@@ -334,6 +334,10 @@ body {
   }
 }
 
+.birds-layer img {
+  mix-blend-mode: screen;
+}
+
 @media (max-width: 900px) {
   .eli-layout { grid-template-columns: 1fr; }
   .cage-container { min-height: 400px; }
