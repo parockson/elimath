@@ -279,11 +279,11 @@ export default function Grid({ onBirdMove, weather = "Summer", autoMode = false,
       <svg ref={svgRef} viewBox={`0 0 ${VIEWBOX.w} ${VIEWBOX.h}`} width="100%" height="100%"
         style={{ position: "absolute", inset: 0, zIndex: 3, touchAction: "none", pointerEvents: "none" }}
       >
-        {/* Outer polygon */}
+        {/* Outer rectangle */}
         <polygon points={`${nodes.A1.x},${nodes.A1.y} ${nodes.E1.x},${nodes.E1.y} ${nodes.E7.x},${nodes.E7.y} ${nodes.A7.x},${nodes.A7.y}`}
           fill="none" stroke="#60a5fa" strokeWidth="2.5" opacity="0.9" />
 
-        {/* Inner polygon */}
+        {/* Inner square */}
         <polygon points={`${nodes.A2.x},${nodes.A2.y} ${nodes.E2.x},${nodes.E2.y} ${nodes.E6.x},${nodes.E6.y} ${nodes.A6.x},${nodes.A6.y}`}
           fill="none" stroke="#fb923c" strokeWidth="2.5" opacity="0.9" />
 

@@ -404,7 +404,7 @@ export default function App() {
         )}
         {stage === 1 && <TestForm stageNumber={1} onComplete={(d) => { setPreTestData(d); setStage(2); }} />}
         {stage === 2 && (
-          <ELIInterface timer={eliTimer} onComplete={() => { toggleModal('lock', true); setStage(3); }} />
+          <ELIInterface timer={eliTimer} setTimer={setEliTimer} onComplete={() => { toggleModal('lock', true); setStage(3); }} />
         )}
         {stage === 3 && <TestForm stageNumber={3} onComplete={handleFinalSubmit} isFinal={true} loading={loading} />}
         {stage === 4 && <div className="card text-center"><h2 className="gradient-text">Submission Successful</h2><p>Thank you, {fullName}. Your data has been recorded.</p></div>}
