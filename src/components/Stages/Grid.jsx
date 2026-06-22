@@ -255,25 +255,52 @@ export default function Grid({ onBirdMove, weather = "Summer", autoMode = false,
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
     >
-      {/* BACKGROUND VIDEO */}
-      <video ref={videoRef} autoPlay loop muted playsInline style={{
-        position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
-        objectFit: "cover", zIndex: 0,
-      }}>
-        <source src="/birds/background.mp4" type="video/mp4" />
-      </video>
-
-      {/* DARK OVERLAY — HTML div so bird transparent pixels show video, not this */}
+      {/* BACKGROUND IMAGE AND DYNAMIC EFFECTS */}
       <div style={{
         position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
-        background: "rgba(0,0,0,0.45)", zIndex: 1, pointerEvents: "none"
+        zIndex: 0, overflow: "hidden"
+      }}>
+        <img 
+          src={
+            weather === 'Winter' ? '/cold.jpg' : 
+            weather === 'Monsoon' ? '/warm.jpg' : 
+            '/hot.jpg'
+          } 
+          alt={weather} 
+          style={{
+            width: "100%", height: "100%",
+            objectFit: "cover",
+            transition: "all 1.5s ease-in-out",
+          }} 
+        />
+        
+        {/* Dynamic Weather Overlay Effects */}
+        {weather === 'Winter' && (
+          <>
+            <div className="snow-layer-1" />
+            <div className="snow-layer-2" />
+          </>
+        )}
+        {weather === 'Monsoon' && (
+          <div className="warm-glow" />
+        )}
+        {weather === 'Summer' && (
+          <div className="hot-flare" />
+        )}
+      </div>
+
+      {/* DARK OVERLAY — HTML div so bird transparent pixels show background, not this */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
+        background: "rgba(0,0,0,0.35)", zIndex: 1, pointerEvents: "none"
       }} />
 
       {/* WEATHER TINT — also HTML div */}
       <div style={{
         position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
         background: weatherOverlay[weather] ?? weatherOverlay.Summer,
-        zIndex: 2, pointerEvents: "none", transition: "background 1.5s ease"
+        zIndex: 2, pointerEvents: "none", transition: "background 1.5s ease",
+        mixBlendMode: "multiply", opacity: 0.4
       }} />
 
       <svg ref={svgRef} viewBox={`0 0 ${VIEWBOX.w} ${VIEWBOX.h}`} width="100%" height="100%"

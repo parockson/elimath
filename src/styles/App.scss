@@ -664,3 +664,136 @@ body {
   }
 }
 
+/* Home Split Hero Layout */
+.home-split-hero {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 40px;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(127, 29, 29, 0.08);
+  border: 1px solid rgba(127, 29, 29, 0.05);
+  overflow: hidden;
+  padding: 40px;
+  align-items: center;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%);
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 24px;
+  }
+
+  .hero-poster-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .hero-poster-img {
+      width: 100%;
+      max-width: 440px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+      border: 1px solid #f1f5f9;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18);
+      }
+    }
+  }
+
+  .hero-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: left;
+    height: 100%;
+    justify-content: center;
+
+    .hero-title-mini {
+      font-size: 2.1rem;
+      font-weight: 900;
+      color: #7f1d1d;
+      line-height: 1.25;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+  }
+}
+
+/* Dynamic Weather Animations & Layers */
+.snow-layer-1 {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;
+  background-image: 
+    radial-gradient(3px 3px at 40px 60px, #fff, rgba(0,0,0,0)),
+    radial-gradient(4px 4px at 180px 140px, #fff, rgba(0,0,0,0)),
+    radial-gradient(5px 5px at 320px 220px, #fff, rgba(0,0,0,0)),
+    radial-gradient(3px 3px at 100px 340px, #fff, rgba(0,0,0,0)),
+    radial-gradient(4px 4px at 250px 420px, #fff, rgba(0,0,0,0)),
+    radial-gradient(4px 4px at 50px 500px, #fff, rgba(0,0,0,0));
+  background-size: 400px 500px;
+  animation: snow-fall-slow 15s linear infinite;
+  opacity: 0.85;
+}
+
+.snow-layer-2 {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;
+  background-image: 
+    radial-gradient(2px 2px at 120px 180px, #fff, rgba(0,0,0,0)),
+    radial-gradient(3px 3px at 290px 70px, #fff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 220px 290px, #fff, rgba(0,0,0,0)),
+    radial-gradient(3px 3px at 370px 400px, #fff, rgba(0,0,0,0)),
+    radial-gradient(3px 3px at 150px 460px, #fff, rgba(0,0,0,0));
+  background-size: 300px 450px;
+  animation: snow-fall-fast 9s linear infinite;
+  opacity: 0.75;
+}
+
+@keyframes snow-fall-slow {
+  0% { background-position: 0px 0px; }
+  100% { background-position: 80px 500px; }
+}
+
+@keyframes snow-fall-fast {
+  0% { background-position: 0px 0px; }
+  100% { background-position: -40px 450px; }
+}
+
+.warm-glow {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;
+  background: linear-gradient(180deg, rgba(251, 146, 60, 0.22) 0%, rgba(244, 63, 94, 0.08) 100%);
+  mix-blend-mode: screen;
+  animation: morning-pulse 8s ease-in-out infinite alternate;
+}
+
+@keyframes morning-pulse {
+  0% { opacity: 0.65; }
+  100% { opacity: 1; }
+}
+
+.hot-flare {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;
+  background: radial-gradient(circle at 75% 25%, rgba(253, 224, 71, 0.28) 0%, rgba(253, 224, 71, 0) 65%);
+  mix-blend-mode: screen;
+  animation: heat-shimmer 5s ease-in-out infinite alternate;
+}
+
+@keyframes heat-shimmer {
+  0% { opacity: 0.75; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.04); }
+}
+
+

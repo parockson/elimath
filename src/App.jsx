@@ -356,17 +356,18 @@ export default function App() {
         </div>
       </nav>
 
-      <div className={`container ${stage === 2 ? 'wide' : ''}`}>
+      <div className={`container ${stage === 2 || stage === 0 ? 'wide' : ''}`}>
         {stage === 0 && (
-          <div className="home-hero animate-fade-in">
-            <div className="hero-content">
+          <div className="home-split-hero animate-fade-in">
+            <div className="hero-poster-container">
+              <img src="/cover.jpg" alt="Transform Shapes, Create Possibilities" className="hero-poster-img" />
+            </div>
+            <div className="hero-form-container">
               <div className="hero-badge">Welcome to ELI</div>
-              <h1 className="hero-title">Automated Theorem Prover <br/><span className="gradient-text">Learning Environment</span></h1>
-              <p className="hero-subtitle">Engage with ELI through a structured three-part process designed to build your understanding of mathematical proofs and scientific thinking.</p>
+              <h1 className="hero-title-mini">Automated Theorem Prover <br/><span className="gradient-text">Learning Environment</span></h1>
+              <p className="hero-subtitle" style={{ marginBottom: '20px' }}>Engage with ELI through a structured three-part process designed to build your understanding of mathematical proofs and scientific thinking.</p>
               
-              <ShapeVisuals type={3} scale={1.8} />
-
-              <div className="process-steps">
+              <div className="process-steps" style={{ marginBottom: '25px', padding: '20px 15px' }}>
                 <div className="process-step">
                   <div className="step-icon">1</div>
                   <div className="step-text">Pre-Test</div>
@@ -383,7 +384,7 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="hero-notice">
+              <div className="hero-notice" style={{ marginBottom: '20px', justifyContent: 'flex-start' }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <span>Access to subsequent stages is only granted upon completion of the prior stage.</span>
               </div>
