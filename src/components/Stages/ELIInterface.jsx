@@ -198,10 +198,10 @@ const PreambleView = ({ timer, setTimer, onProceed, isReturning }) => {
 
 const ELIInterface = ({ timer, setTimer, onComplete }) => {
   const [mode, setMode] = useState('Manual');
-  const [weather, setWeather] = useState('Summer');
+  const [weather, setWeather] = useState('Warm');
   const [movedBirds, setMovedBirds] = useState(new Set());
   const [lastMove, setLastMove] = useState(null);
-  const [seasonsSeeen, setSeasonsSeeen] = useState(new Set(['Summer']));
+  const [seasonsSeeen, setSeasonsSeeen] = useState(new Set(['Warm']));
   const [sequenceComplete, setSequenceComplete] = useState(false);
   const [viewingPreamble, setViewingPreamble] = useState(timer < 60);
   const [hasEnteredProof, setHasEnteredProof] = useState(false);
@@ -215,9 +215,9 @@ const ELIInterface = ({ timer, setTimer, onComplete }) => {
   // Weather updates based on moved birds
   useEffect(() => {
     let newWeather;
-    if (movedBirds.size >= 6) newWeather = 'Monsoon';
-    else if (movedBirds.size >= 3) newWeather = 'Winter';
-    else newWeather = 'Summer';
+    if (movedBirds.size >= 6) newWeather = 'Cold';
+    else if (movedBirds.size >= 3) newWeather = 'Hot';
+    else newWeather = 'Warm';
     setWeather(newWeather);
     setSeasonsSeeen(prev => new Set([...prev, newWeather]));
   }, [movedBirds]);
@@ -279,12 +279,12 @@ const ELIInterface = ({ timer, setTimer, onComplete }) => {
 
           <h4 style={{marginTop: '20px'}}>Weather State</h4>
           <div className="weather-select" style={{ background: '#f1f5f9', border: '1px dashed #cbd5e1', color: '#0f172a', fontWeight: '800', borderRadius: '8px', padding: '10px', textAlign: 'center' }}>
-            {weather === 'Summer' && '☀️ Summer'}
-            {weather === 'Winter' && '❄️ Winter'}
-            {weather === 'Monsoon' && '🌧️ Monsoon'}
+            {weather === 'Warm' && '🌅 Warm'}
+            {weather === 'Hot' && '🌇 Hot'}
+            {weather === 'Cold' && '❄️ Cold'}
           </div>
           <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '6px', textAlign: 'center' }}>
-            {movedBirds.size}/6 birds moved · {[...seasonsSeeen].map(s => s === 'Summer' ? '☀️' : s === 'Winter' ? '❄️' : '🌧️').join(' ')}
+            {movedBirds.size}/6 birds moved · {[...seasonsSeeen].map(s => s === 'Warm' ? '🌅' : s === 'Hot' ? '🌇' : '❄️').join(' ')}
           </div>
         </div>
 
@@ -317,7 +317,7 @@ const ELIInterface = ({ timer, setTimer, onComplete }) => {
 
         {/* AI CONCEPT CARD */}
         <div className="panel-card" style={{ padding: '16px' }}>
-          <h3 style={{ marginBottom: '12px' }}>AI Concept</h3>
+          <h3 style={{ marginBottom: '12px', fontSize: '0.88rem' }}>Explainable Interface for AI Concepts</h3>
           {lastMove ? (
             <AIConceptCard concept={lastMove} />
           ) : (

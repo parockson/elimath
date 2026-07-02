@@ -12,9 +12,9 @@ import {
 WEATHER OVERLAY COLORS
 =============================== */
 const weatherOverlay = {
-  Summer:  "rgba(251, 191,  36, 0.18)",
-  Winter:  "rgba( 96, 165, 250, 0.22)",
-  Monsoon: "rgba( 30,  58, 138, 0.45)",
+  Hot:  "rgba(251, 191,  36, 0.18)",
+  Cold:  "rgba( 96, 165, 250, 0.22)",
+  Warm: "rgba( 30,  58, 138, 0.35)", // lighter tint for sunrise
 };
 
 /* ===============================
@@ -45,7 +45,7 @@ const birdPosToPercent = ({ x, y }) => ({
 /* ===============================
 GRID COMPONENT
 =============================== */
-export default function Grid({ onBirdMove, weather = "Summer", autoMode = false, onSequenceComplete }) {
+export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, onSequenceComplete }) {
   const [birdNodes,   setBirdNodes]   = useState(() => Object.fromEntries(initialBirdLabels.map(l => [l, l])));
   const [birdPathIdx, setBirdPathIdx] = useState(() => Object.fromEntries(initialBirdLabels.map(l => [l, 0])));
   const [movingBird,  setMovingBird]  = useState(null);
@@ -334,18 +334,32 @@ export default function Grid({ onBirdMove, weather = "Summer", autoMode = false,
         })}
 
         {/* GRID NODES */}
-        {Object.entries(nodes).map(([l, p]) => (
-          <g key={l}>
-            <circle cx={p.x} cy={p.y} r={5} fill={getNodeColor(l)} stroke="white" strokeWidth="1.5" />
-            <text x={p.x + 8} y={p.y - 6} fontSize="11" fill="rgba(255,255,255,0.85)" fontWeight="600">{l}</text>
-          </g>
-        ))}
+        {Object.entries(nodes).map(([l, p]) => {
+          const isCalculatedNode = [
+            "A1", "A2", "C1", "C2", "E1", "E2", 
+            "A7", "A6", "C7", "C6", "E7", "E6", "C4"
+          ].includes(l);
+          return (
+            <g key={l}>
+              <circle cx={p.x} cy={p.y} r={5} fill={getNodeColor(l)} stroke="white" strokeWidth="1.5" />
+              <text x={p.x + 8} y={p.y - 6} fontSize="11" fill="rgba(255,255,255,0.85)" fontWeight="600">{l}</text>
+              {isCalculatedNode && (
+                <text x={p.x + 8} y={p.y + 6} fontSize="9" fill="rgba(255,255,255,0.6)" fontWeight="500">
+                  ({Math.round(p.x)},{Math.round(p.y)})
+                </text>
+              )}
+            </g>
+          );
+        })}
 
         {/* ALPHA NODES */}
         {Object.entries(alpha).map(([l, p]) => (
           <g key={l}>
             <circle cx={p.x} cy={p.y} r={6} fill={COLOR_DEEP_GREEN} stroke="white" strokeWidth="1.5" />
             <text x={p.x + 9} y={p.y - 6} fontSize="11" fill="red" fontWeight="700">{l}</text>
+            <text x={p.x + 9} y={p.y + 6} fontSize="9" fill="rgba(255,200,200,0.8)" fontWeight="600">
+              ({Math.round(p.x)},{Math.round(p.y)})
+            </text>
           </g>
         ))}
       </svg>
@@ -359,26 +373,51 @@ export default function Grid({ onBirdMove, weather = "Summer", autoMode = false,
           const pos = birdPosToPercent(p);
 
           return (
-            <img
+            <div
               key={birdId}
-              src={getBirdSrc(isFlapping)}
-              alt=""
-              draggable={false}
               style={{
                 position: "absolute",
                 left: pos.left,
                 top: pos.top,
                 width: `${(BIRD_SIZE / VIEWBOX.w) * 100}%`,
-                height: "auto",
                 transform: "translate(-50%, -50%)",
-                mixBlendMode: "screen",
-                cursor: hasPath && !autoMode ? (isFlapping ? "grabbing" : "grab") : "default",
-                pointerEvents: hasPath && !autoMode ? "auto" : "none",
-                userSelect: "none",
-                touchAction: "none",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                pointerEvents: "none"
               }}
-              onPointerDown={hasPath && !autoMode ? (e) => handlePointerDown(e, birdId) : undefined}
-            />
+            >
+              <img
+                src={getBirdSrc(isFlapping)}
+                alt=""
+                draggable={false}
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  mixBlendMode: "screen",
+                  cursor: hasPath && !autoMode ? (isFlapping ? "grabbing" : "grab") : "default",
+                  pointerEvents: hasPath && !autoMode ? "auto" : "none",
+                  userSelect: "none",
+                  touchAction: "none",
+                }}
+                onPointerDown={hasPath && !autoMode ? (e) => handlePointerDown(e, birdId) : undefined}
+              />
+              <div style={{
+                background: "rgba(15, 23, 42, 0.8)",
+                color: "#fff",
+                padding: "1px 4px",
+                borderRadius: "3px",
+                fontSize: "0.65rem",
+                fontFamily: "monospace",
+                marginTop: "-4px",
+                whiteSpace: "nowrap",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.4)",
+                zIndex: 10
+              }}>
+                ({Math.round(p.x)},{Math.round(p.y)})
+              </div>
+            </div>
           );
         })}
       </div>
