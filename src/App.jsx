@@ -365,22 +365,33 @@ export default function App() {
             <div className="hero-form-container">
               <div className="hero-badge">Welcome to ELI</div>
               <h1 className="hero-title-mini">Automated Theorem Prover <br/><span className="gradient-text">Learning Environment</span></h1>
-              <p className="hero-subtitle" style={{ marginBottom: '20px' }}>Engage with ELI through a structured three-part process designed to build your understanding of mathematical proofs and scientific thinking.</p>
-              
+              <p className="hero-subtitle" style={{ marginBottom: '20px' }}>
+                Welcome to ELI, an interactive learning environment designed to <em>develop</em> your existing advanced mathematical thinking, mathematical proof, and AI literacy within the context of the structural transformation of one two-dimensional (2D) shape into another. Your learning journey is organized into three parts:
+              </p>
+
               <div className="process-steps" style={{ marginBottom: '25px', padding: '20px 15px' }}>
                 <div className="process-step">
                   <div className="step-icon">1</div>
-                  <div className="step-text">Pre-Test</div>
+                  <div className="step-text">
+                    <strong>Pre-test</strong>
+                    <span>Explore your current understanding of how a rectangle can be transformed into a square and then into a circle, including the underlying mathematical ideas and AI concepts.</span>
+                  </div>
                 </div>
                 <div className="process-divider"></div>
                 <div className="process-step">
                   <div className="step-icon">2</div>
-                  <div className="step-text">ELI Interaction</div>
+                  <div className="step-text">
+                    <strong>Learning with ELI</strong>
+                    <span>Engage with ELI to explore one possible approach to structurally transforming a rectangle into a square and then into a circle, observing the mathematical reasoning, proof strategies, and AI concepts involved.</span>
+                  </div>
                 </div>
                 <div className="process-divider"></div>
                 <div className="process-step">
                   <div className="step-icon">3</div>
-                  <div className="step-text">Post-Test</div>
+                  <div className="step-text">
+                    <strong>Post-test</strong>
+                    <span>Complete the pre-test again to demonstrate how your mathematical thinking, proof, and AI literacy have changed or been extended through your engagement with ELI.</span>
+                  </div>
                 </div>
               </div>
 

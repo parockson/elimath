@@ -119,28 +119,34 @@ const PreambleView = ({ timer, setTimer, onProceed, isReturning }) => {
 
         <div className="preamble-column">
           <div className="proof-block">
-            <h3>Proving the Rectangle-to-Square Transformation</h3>
+            <h3>Rectangle to Square Transformation in ELI</h3>
             <p>
-              ELI demonstrates one proof by moving the points on the longer sides horizontally inward until all four sides become equal. The proof is based on preserving equal horizontal and vertical displacement, resulting in a figure that satisfies the defining properties of a square.
+              ELI demonstrates one possible proof for transforming a rectangle into a square using a geometric transformation called <strong>vertical scaling</strong>. The rectangle has width 320 units and height 480 units, with centre fixed at E(310, 300).
+            </p>
+            <p>
+              Since a square requires four equal sides, ELI reduces the height to equal the width by scaling only the vertical distance of each vertex from the centre by the factor <em>320/480 = 2/3</em>, while keeping horizontal coordinates unchanged. The resulting figure has equal width and height (320 units each), with right angles preserved.
             </p>
             <div className="ai-tag manhattan">
               <span>AI Concept:</span> Manhattan Distance
             </div>
             <p className="ai-concept-detail">
-              Movement is measured along horizontal and vertical paths rather than by direct diagonal movement.
+              ELI verifies the transformation by computing the Manhattan distance each vertex travelled. All four vertices move exactly <strong>80 units</strong> along the vertical direction, confirming the scaling was applied consistently. Manhattan distance — used in AI for grid-based pathfinding, robot navigation, and image processing — measures movement along horizontal and vertical paths rather than direct diagonal distances.
             </p>
           </div>
 
           <div className="proof-block">
-            <h3>Proving the Square-to-Circle Transformation</h3>
+            <h3>Square to Circle Transformation in ELI</h3>
             <p>
-              ELI then demonstrates how the corner points move diagonally towards the centre until they are all the same straight-line distance from that centre. These equal distances become the radii that define the circle.
+              ELI next demonstrates how to transform the square into a circle using a <strong>centre-based Euclidean distance constraint</strong>. Rather than moving corner vertices, ELI redefines the figure's boundary as the set of all points equidistant from the fixed centre E(310, 300).
+            </p>
+            <p>
+              ELI introduces eight boundary points: four along the square's symmetry lines — (310, 140), (470, 300), (310, 460), (150, 300) — and four along its diagonals — (196.86, 186.86), (423.14, 186.86), (423.14, 413.14), (196.86, 413.14). Each point is exactly <strong>160 units</strong> from the centre, establishing a constant radius and satisfying the defining property of a circle.
             </p>
             <div className="ai-tag euclidean">
               <span>AI Concept:</span> Euclidean Distance
             </div>
             <p className="ai-concept-detail">
-              Measures the shortest straight-line distance between two points.
+              Euclidean distance (L2) measures the shortest straight-line distance between two points — unlike Manhattan distance, which follows grid directions. It is used in AI for computer vision, facial recognition, autonomous vehicles, and clustering algorithms such as k-means. Within ELI, it verifies that every selected boundary point lies at the same straight-line distance from the centre.
             </p>
           </div>
 

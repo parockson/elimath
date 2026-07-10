@@ -7,17 +7,21 @@ const rows = [1, 2, 3, 4, 5, 6, 7];
 
 export const nodes = {};
 
-// Increase spacing to make grid larger
+// Scale: 80 units per column (x), 80 units per row (y)
+// Y-axis is flipped so Row 1 is at the BOTTOM and Row 7 at the TOP
+// (standard mathematical graph convention: y increases upward)
 const SPACING_X = 80;
 const SPACING_Y = 80;
-const OFFSET_X = 150; // shift right to center in a 700 width canvas
-const OFFSET_Y = 60;  // shift down
+const OFFSET_X = 150;  // A-column x-start
+const OFFSET_Y = 60;   // Row 7 y-position (top of canvas)
+const MAX_ROW_IDX = rows.length - 1; // = 6
 
 columns.forEach((col, colIdx) => {
   rows.forEach((row, rowIdx) => {
     nodes[`${col}${row}`] = {
       x: OFFSET_X + colIdx * SPACING_X,
-      y: OFFSET_Y + rowIdx * SPACING_Y
+      // Flip: rowIdx=0 (row 1) → bottom; rowIdx=6 (row 7) → top
+      y: OFFSET_Y + (MAX_ROW_IDX - rowIdx) * SPACING_Y
     };
   });
 });
@@ -50,12 +54,19 @@ export const getNodeColor = (label) => {
 ALPHA NODES
 =============================== */
 
-// Alpha nodes sit at the corners of the inner square (circumscribed circle)
+// Alpha nodes sit at the diagonal midpoints of the inscribed circle
+// (inset 45-degree from square corners toward center)
+// After Y-flip: A2=(150,460), A6=(150,140), E2=(470,460), E6=(470,140)
+// Inner diagonal offset = 160 * (1 - 1/√2) ≈ 160 * 0.2929 ≈ 46.86 ≈ 49 units
 export const alpha = {
-  α1: { x: (nodes["A2"]?.x ?? 125) + 49, y: (nodes["A6"]?.y ?? 355) - 49 }, // right+up
-  α2: { x: (nodes["A2"]?.x ?? 125) + 49, y: (nodes["A2"]?.y ?? 120) + 49 }, // right+down
-  α3: { x: (nodes["E2"]?.x ?? 455) - 49, y: (nodes["A2"]?.y ?? 120) + 49 }, // left+down
-  α4: { x: (nodes["E2"]?.x ?? 455) - 49, y: (nodes["A6"]?.y ?? 440) - 49 }, // left+up
+  // Near A6 (top-left corner of square): move right and down toward center
+  α1: { x: (nodes["A6"]?.x ?? 150) + 49, y: (nodes["A6"]?.y ?? 140) + 49 },
+  // Near A2 (bottom-left corner of square): move right and up toward center
+  α2: { x: (nodes["A2"]?.x ?? 150) + 49, y: (nodes["A2"]?.y ?? 460) - 49 },
+  // Near E2 (bottom-right corner of square): move left and up toward center
+  α3: { x: (nodes["E2"]?.x ?? 470) - 49, y: (nodes["E2"]?.y ?? 460) - 49 },
+  // Near E6 (top-right corner of square): move left and down toward center
+  α4: { x: (nodes["E6"]?.x ?? 470) - 49, y: (nodes["E6"]?.y ?? 140) + 49 },
 };
 
 /* ===============================

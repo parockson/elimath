@@ -262,9 +262,9 @@ export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, o
       }}>
         <img 
           src={
-            weather === 'Winter' ? '/cold.jpg' : 
-            weather === 'Monsoon' ? '/warm.jpg' : 
-            '/hot.jpg'
+            weather === 'Cold' ? '/cold.jpg' : 
+            weather === 'Hot'  ? '/hot.jpg'  : 
+            '/warm.jpg'
           } 
           alt={weather} 
           style={{
@@ -275,16 +275,16 @@ export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, o
         />
         
         {/* Dynamic Weather Overlay Effects */}
-        {weather === 'Winter' && (
+        {weather === 'Cold' && (
           <>
             <div className="snow-layer-1" />
             <div className="snow-layer-2" />
           </>
         )}
-        {weather === 'Monsoon' && (
+        {weather === 'Warm' && (
           <div className="warm-glow" />
         )}
-        {weather === 'Summer' && (
+        {weather === 'Hot' && (
           <div className="hot-flare" />
         )}
       </div>
