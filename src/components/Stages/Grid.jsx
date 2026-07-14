@@ -55,8 +55,11 @@ export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, o
 
   const videoRef      = useRef(null);
   const svgRef        = useRef(null);
+  const containerRef  = useRef(null);
   const dragStartNode = useRef(null);
   const dragTargetRef = useRef(null);
+  const lastPosRef = useRef(null);
+  const rafRef = useRef(null);
   const autoTimers    = useRef([]);
 
   // Geometric constants
@@ -166,10 +169,11 @@ export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, o
 
   /* ===============================
   DRAG AND DROP (Manual)
-  =============================== */
-  const getSVGPos = (e) => {
-    const CTM = svgRef.current.getScreenCTM();
-    return { x: (e.clientX - CTM.e) / CTM.a, y: (e.clientY - CTM.f) / CTM.d };
+  ===============================  */
+  const getSVGPos = (clientX, clientY) => {
+    const CTM = svgRef.current?.getScreenCTM();
+    if (!CTM) return null;
+    return { x: (clientX - CTM.e) / CTM.a, y: (clientY - CTM.f) / CTM.d };
   };
 
   const getValidTarget = (birdId, fromNodeLabel, toNodeLabel) => {
@@ -184,24 +188,40 @@ export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, o
 
   const handlePointerDown = (e, birdId) => {
     if (autoMode) return;
-    if (videoRef.current?.muted) {
-      videoRef.current.muted = false;
-      videoRef.current.play().catch(() => {});
-    }
+    e.preventDefault();
     dragStartNode.current = birdNodes[birdId];
     dragTargetRef.current = e.currentTarget;
     setMovingBird(birdId);
-    setDragPos(getSVGPos(e));
+    const pos = getSVGPos(e.clientX, e.clientY);
+    if (pos) setDragPos(pos);
+    // Capture globally so pointer can't escape
     e.currentTarget.setPointerCapture(e.pointerId);
   };
 
   const handlePointerMove = (e) => {
-    if (!movingBird || !svgRef.current) return;
-    setDragPos(getSVGPos(e));
+    if (!movingBird) return;
+    e.preventDefault();
+    const pos = getSVGPos(e.clientX, e.clientY);
+    if (!pos) return;
+    // Throttle state updates to animation frames for smoother dragging
+    lastPosRef.current = pos;
+    if (rafRef.current == null) {
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null;
+        if (lastPosRef.current) setDragPos(lastPosRef.current);
+      });
+    }
   };
 
   const handlePointerUp = (e) => {
-    if (!movingBird || !dragPos) return;
+    if (!movingBird) { setMovingBird(null); setDragPos(null); return; }
+
+    // flush any pending RAF update
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+      if (lastPosRef.current) setDragPos(lastPosRef.current);
+    }
 
     let closestLabel = null;
     let minDist = Infinity;
@@ -228,6 +248,7 @@ export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, o
     dragTargetRef.current = null;
     setMovingBird(null);
     setDragPos(null);
+    lastPosRef.current = null;
   };
 
   /* ===============================
@@ -245,12 +266,15 @@ export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, o
 
   return (
     <div
+      ref={containerRef}
       style={{
         position: "relative",
         width: "100%",
         maxWidth: "800px",
         margin: "0 auto",
         aspectRatio: `${VIEWBOX.w} / ${VIEWBOX.h}`,
+        touchAction: "none",          // prevents scroll competing with drag
+        userSelect: "none",
       }}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
@@ -270,7 +294,7 @@ export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, o
           style={{
             width: "100%", height: "100%",
             objectFit: "cover",
-            transition: "all 1.5s ease-in-out",
+              transition: "all 0.35s ease-in-out",
           }} 
         />
         
@@ -299,7 +323,7 @@ export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, o
       <div style={{
         position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
         background: weatherOverlay[weather] ?? weatherOverlay.Summer,
-        zIndex: 2, pointerEvents: "none", transition: "background 1.5s ease",
+        zIndex: 2, pointerEvents: "none", transition: "background 0.35s ease",
         mixBlendMode: "multiply", opacity: 0.4
       }} />
 
@@ -384,8 +408,12 @@ export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, o
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                pointerEvents: "none"
+                // Bird container itself is the drag target — larger hit area
+                pointerEvents: hasPath && !autoMode ? "auto" : "none",
+                cursor: hasPath && !autoMode ? (isFlapping ? "grabbing" : "grab") : "default",
+                touchAction: "none",
               }}
+              onPointerDown={hasPath && !autoMode ? (e) => handlePointerDown(e, birdId) : undefined}
             >
               <img
                 src={getBirdSrc(isFlapping)}
@@ -395,12 +423,10 @@ export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, o
                   width: "100%",
                   height: "auto",
                   mixBlendMode: "screen",
-                  cursor: hasPath && !autoMode ? (isFlapping ? "grabbing" : "grab") : "default",
-                  pointerEvents: hasPath && !autoMode ? "auto" : "none",
+                  pointerEvents: "none",  // img passes events up to container div
                   userSelect: "none",
                   touchAction: "none",
                 }}
-                onPointerDown={hasPath && !autoMode ? (e) => handlePointerDown(e, birdId) : undefined}
               />
               <div style={{
                 background: "rgba(15, 23, 42, 0.8)",
@@ -413,7 +439,8 @@ export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, o
                 whiteSpace: "nowrap",
                 border: "1px solid rgba(255, 255, 255, 0.2)",
                 boxShadow: "0 2px 4px rgba(0, 0, 0, 0.4)",
-                zIndex: 10
+                zIndex: 10,
+                pointerEvents: "none",
               }}>
                 ({Math.round(p.x)},{Math.round(p.y)})
               </div>

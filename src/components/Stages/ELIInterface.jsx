@@ -15,6 +15,82 @@ const getMovementKind = (dx, dy) => {
 /* ===============================
   AI CONCEPT CARD
 =============================== */
+/* ===============================
+  STEP-BY-STEP CALCULATION PANEL
+=============================== */
+const CalcSteps = ({ concept }) => {
+  const { distConcept, fromLabel, toLabel, fromPos, toPos, manhattan, euclidean } = concept;
+  const fx = Math.round(fromPos.x), fy = Math.round(fromPos.y);
+  const tx = Math.round(toPos.x),   ty = Math.round(toPos.y);
+  const dx = tx - fx, dy = ty - fy;
+
+  const stepStyle = {
+    background: '#f8fafc',
+    borderRadius: '8px',
+    padding: '10px 12px',
+    marginBottom: '8px',
+    borderLeft: '3px solid',
+    fontSize: '0.8rem',
+    lineHeight: '1.6',
+    fontFamily: 'monospace',
+  };
+  const labelStyle = { fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b', marginBottom: '4px' };
+
+  if (distConcept === 'Manhattan Distance') {
+    return (
+      <div>
+        <div style={{ fontWeight: 700, fontSize: '0.78rem', color: '#1e40af', marginBottom: '8px' }}>
+          📐 Step-by-step: Rectangle → Square
+        </div>
+        <div style={{ ...stepStyle, borderColor: '#3b82f6' }}>
+          <div style={labelStyle}>Step 1 — Identify the points</div>
+          From: <strong>{fromLabel}</strong> ({fx}, {fy}) &nbsp;→&nbsp; To: <strong>{toLabel}</strong> ({tx}, {ty})
+        </div>
+        <div style={{ ...stepStyle, borderColor: '#8b5cf6' }}>
+          <div style={labelStyle}>Step 2 — Apply the formula</div>
+          d = |x₂ − x₁| + |y₂ − y₁|<br/>
+          d = |{tx} − {fx}| + |{ty} − {fy}|<br/>
+          d = |{dx}| + |{dy}|
+        </div>
+        <div style={{ ...stepStyle, borderColor: '#16a34a', background: '#f0fdf4' }}>
+          <div style={labelStyle}>Step 3 — Result</div>
+          Manhattan distance = <strong style={{ color: '#15803d' }}>{manhattan} units</strong><br/>
+          <span style={{ color: '#64748b', fontSize: '0.72rem' }}>All vertices moved this exact distance vertically — confirming consistent vertical scaling.</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Euclidean
+  const dx2 = (dx * dx).toFixed(0);
+  const dy2 = (dy * dy).toFixed(0);
+  const sumSq = (dx * dx + dy * dy).toFixed(0);
+  return (
+    <div>
+      <div style={{ fontWeight: 700, fontSize: '0.78rem', color: '#7c3aed', marginBottom: '8px' }}>
+        📐 Step-by-step: Square → Circle
+      </div>
+      <div style={{ ...stepStyle, borderColor: '#3b82f6' }}>
+        <div style={labelStyle}>Step 1 — Identify the points</div>
+        From: <strong>{fromLabel}</strong> ({fx}, {fy}) &nbsp;→&nbsp; To: <strong>{toLabel}</strong> ({tx}, {ty})
+      </div>
+      <div style={{ ...stepStyle, borderColor: '#8b5cf6' }}>
+        <div style={labelStyle}>Step 2 — Apply the formula</div>
+        d = √((x₂−x₁)² + (y₂−y₁)²)<br/>
+        d = √(({tx}−{fx})² + ({ty}−{fy})²)<br/>
+        d = √({dx}² + {dy}²)<br/>
+        d = √({dx2} + {dy2})<br/>
+        d = √{sumSq}
+      </div>
+      <div style={{ ...stepStyle, borderColor: '#16a34a', background: '#f0fdf4' }}>
+        <div style={labelStyle}>Step 3 — Result</div>
+        Euclidean distance = <strong style={{ color: '#15803d' }}>{euclidean} units</strong><br/>
+        <span style={{ color: '#64748b', fontSize: '0.72rem' }}>This equals the circle radius — every boundary point is equidistant from centre E(310, 300).</span>
+      </div>
+    </div>
+  );
+};
+
 const AIConceptCard = ({ concept }) => {
   const { movementType, distConcept, fromLabel, toLabel, fromPos, toPos, manhattan, euclidean } = concept;
 
@@ -65,10 +141,9 @@ const AIConceptCard = ({ concept }) => {
         </>
       )}
 
-      {/* Divider */}
-      <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: '#64748b' }}>
-        <span>From: <strong>{fromLabel}</strong> → To: <strong>{toLabel}</strong></span>
-        <span style={{ fontFamily: 'monospace' }}>({fx},{fy}) → ({tx},{ty})</span>
+      {/* Step-by-step calculations */}
+      <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '12px', marginTop: '4px' }}>
+        <CalcSteps concept={concept} />
       </div>
     </div>
   );
@@ -204,10 +279,10 @@ const PreambleView = ({ timer, setTimer, onProceed, isReturning }) => {
 
 const ELIInterface = ({ timer, setTimer, onComplete }) => {
   const [mode, setMode] = useState('Manual');
-  const [weather, setWeather] = useState('Warm');
+  const [weather, setWeather] = useState('Hot'); // starts Hot = Rectangle stage
   const [movedBirds, setMovedBirds] = useState(new Set());
   const [lastMove, setLastMove] = useState(null);
-  const [seasonsSeeen, setSeasonsSeeen] = useState(new Set(['Warm']));
+  const [seasonsSeeen, setSeasonsSeeen] = useState(new Set(['Hot']));
   const [sequenceComplete, setSequenceComplete] = useState(false);
   const [viewingPreamble, setViewingPreamble] = useState(timer < 60);
   const [hasEnteredProof, setHasEnteredProof] = useState(false);
@@ -219,11 +294,14 @@ const ELIInterface = ({ timer, setTimer, onComplete }) => {
   }, [timer]);
 
   // Weather updates based on moved birds
+  // Hot  = Rectangle stage  (0–2 birds moved  → sunny/hot background)
+  // Warm = Square stage     (3–5 birds moved  → sunrise/sunset background)
+  // Cold = Circle stage     (6   birds moved  → snowy/cold background)
   useEffect(() => {
     let newWeather;
     if (movedBirds.size >= 6) newWeather = 'Cold';
-    else if (movedBirds.size >= 3) newWeather = 'Hot';
-    else newWeather = 'Warm';
+    else if (movedBirds.size >= 3) newWeather = 'Warm';
+    else newWeather = 'Hot';
     setWeather(newWeather);
     setSeasonsSeeen(prev => new Set([...prev, newWeather]));
   }, [movedBirds]);
@@ -283,14 +361,14 @@ const ELIInterface = ({ timer, setTimer, onComplete }) => {
             <button className={`toggle-btn ${mode === 'Manual' ? 'active' : ''}`} onClick={() => setMode('Manual')}>Manual</button>
           </div>
 
-          <h4 style={{marginTop: '20px'}}>Weather State</h4>
+          <h4 style={{marginTop: '20px'}}>Shape Stage</h4>
           <div className="weather-select" style={{ background: '#f1f5f9', border: '1px dashed #cbd5e1', color: '#0f172a', fontWeight: '800', borderRadius: '8px', padding: '10px', textAlign: 'center' }}>
-            {weather === 'Warm' && '🌅 Warm'}
-            {weather === 'Hot' && '🌇 Hot'}
-            {weather === 'Cold' && '❄️ Cold'}
+            {weather === 'Hot'  && '☀️ Rectangle (Hot)'}
+            {weather === 'Warm' && '🌅 Square (Warm)'}
+            {weather === 'Cold' && '❄️ Circle (Cold)'}
           </div>
           <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: '6px', textAlign: 'center' }}>
-            {movedBirds.size}/6 birds moved · {[...seasonsSeeen].map(s => s === 'Warm' ? '🌅' : s === 'Hot' ? '🌇' : '❄️').join(' ')}
+            {movedBirds.size}/6 birds moved · {[...seasonsSeeen].map(s => s === 'Hot' ? '☀️' : s === 'Warm' ? '🌅' : '❄️').join(' ')}
           </div>
         </div>
 
