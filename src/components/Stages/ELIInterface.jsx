@@ -196,10 +196,10 @@ const PreambleView = ({ timer, setTimer, onProceed, isReturning }) => {
           <div className="proof-block">
             <h3>Rectangle to Square Transformation in ELI</h3>
             <p>
-              ELI demonstrates one possible proof for transforming a rectangle into a square using a geometric transformation called <strong>vertical scaling</strong>. The rectangle has width 320 units and height 480 units, with centre fixed at E(310, 300).
+              ELI demonstrates one possible proof for transforming a rectangle into a square using <strong>vertical scaling</strong>. The rectangle has width 320 units and height 480 units, and its centre remains fixed at E(310, 300).
             </p>
             <p>
-              Since a square requires four equal sides, ELI reduces the height to equal the width by scaling only the vertical distance of each vertex from the centre by the factor <em>320/480 = 2/3</em>, while keeping horizontal coordinates unchanged. The resulting figure has equal width and height (320 units each), with right angles preserved.
+              Because a square needs four equal sides, ELI scales only the vertical distance of each vertex from the centre by the factor <em>2/3</em>, while keeping the horizontal coordinates unchanged. The result is a figure with equal width and height of 320 units, and the right angles are preserved.
             </p>
             <div className="ai-tag manhattan">
               <span>AI Concept:</span> Manhattan Distance
@@ -212,10 +212,10 @@ const PreambleView = ({ timer, setTimer, onProceed, isReturning }) => {
           <div className="proof-block">
             <h3>Square to Circle Transformation in ELI</h3>
             <p>
-              ELI next demonstrates how to transform the square into a circle using a <strong>centre-based Euclidean distance constraint</strong>. Rather than moving corner vertices, ELI redefines the figure's boundary as the set of all points equidistant from the fixed centre E(310, 300).
+              ELI next demonstrates how to transform the square into a circle using a <strong>centre-based Euclidean distance constraint</strong>. Instead of moving the corners alone, ELI redefines the boundary as the set of points that are all the same distance from the fixed centre E(310, 300).
             </p>
             <p>
-              ELI introduces eight boundary points: four along the square's symmetry lines — (310, 140), (470, 300), (310, 460), (150, 300) — and four along its diagonals — (196.86, 186.86), (423.14, 186.86), (423.14, 413.14), (196.86, 413.14). Each point is exactly <strong>160 units</strong> from the centre, establishing a constant radius and satisfying the defining property of a circle.
+              The boundary is represented by eight points: four on the symmetry lines — (310, 140), (470, 300), (310, 460), (150, 300) — and four on the diagonals — (196.86, 186.86), (423.14, 186.86), (423.14, 413.14), (196.86, 413.14). Each point is exactly <strong>160 units</strong> from the centre, giving the circle a consistent radius.
             </p>
             <div className="ai-tag euclidean">
               <span>AI Concept:</span> Euclidean Distance

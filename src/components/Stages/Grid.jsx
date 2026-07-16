@@ -7,6 +7,13 @@ import {
   getNodeColor,
   COLOR_DEEP_GREEN,
 } from "./GridData";
+import hotImage from "../../assets/hot.jpeg";
+import warmImage from "../../assets/warm.jpeg";
+import coldImage from "../../assets/snow.jpeg";
+
+const hotAudio = new URL("../../assets/Hot.mpeg", import.meta.url).href;
+const warmAudio = new URL("../../assets/warm.mpeg", import.meta.url).href;
+const coldAudio = new URL("../../assets/cold.mpeg", import.meta.url).href;
 
 /* ===============================
 WEATHER OVERLAY COLORS
@@ -36,6 +43,11 @@ const BIRD_ASSETS = {
   flapA: "/birds/bird-flap11.png",
   flapB: "/birds/bird-flap21.png",
 };
+const STAGE_ASSETS = {
+  Hot: { image: hotImage, audio: hotAudio },
+  Warm: { image: warmImage, audio: warmAudio },
+  Cold: { image: coldImage, audio: coldAudio },
+};
 
 const birdPosToPercent = ({ x, y }) => ({
   left: `${(x / VIEWBOX.w) * 100}%`,
@@ -56,6 +68,7 @@ export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, o
   const videoRef      = useRef(null);
   const svgRef        = useRef(null);
   const containerRef  = useRef(null);
+  const audioRef      = useRef(null);
   const dragStartNode = useRef(null);
   const dragTargetRef = useRef(null);
   const lastPosRef = useRef(null);
@@ -64,7 +77,8 @@ export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, o
 
   // Geometric constants
   const center = nodes.C4;
-  const radius = Math.hypot(center.x - nodes.A2.x, center.y - nodes.A2.y) * 0.7;
+  const squareSide = Math.abs(nodes.E2.x - nodes.A2.x);
+  const radius = squareSide / 2;
   const diag1  = [nodes.A2, nodes.E6];
   const diag2  = [nodes.E2, nodes.A6];
 
@@ -77,6 +91,17 @@ export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, o
     const interval = setInterval(() => setFlapFrame(f => (f + 1) % 2), 80);
     return () => clearInterval(interval);
   }, [movingBird, currentlyFlying]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.pause();
+    audio.currentTime = 0;
+    const playPromise = audio.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {});
+    }
+  }, [weather]);
 
   /* ===============================
   AUTO MODE SEQUENCE
@@ -285,11 +310,7 @@ export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, o
         zIndex: 0, overflow: "hidden"
       }}>
         <img 
-          src={
-            weather === 'Cold' ? '/cold.jpg' : 
-            weather === 'Hot'  ? '/hot.jpg'  : 
-            '/warm.jpg'
-          } 
+          src={STAGE_ASSETS[weather]?.image ?? hotImage} 
           alt={weather} 
           style={{
             width: "100%", height: "100%",
@@ -326,6 +347,8 @@ export default function Grid({ onBirdMove, weather = "Warm", autoMode = false, o
         zIndex: 2, pointerEvents: "none", transition: "background 0.35s ease",
         mixBlendMode: "multiply", opacity: 0.4
       }} />
+
+      <audio ref={audioRef} src={STAGE_ASSETS[weather]?.audio ?? hotAudio} loop />
 
       <svg ref={svgRef} viewBox={`0 0 ${VIEWBOX.w} ${VIEWBOX.h}`} width="100%" height="100%"
         style={{ position: "absolute", inset: 0, zIndex: 3, touchAction: "none", pointerEvents: "none" }}

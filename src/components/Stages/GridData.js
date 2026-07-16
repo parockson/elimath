@@ -7,9 +7,9 @@ const rows = [1, 2, 3, 4, 5, 6, 7];
 
 export const nodes = {};
 
-// Scale: 80 units per column (x), 80 units per row (y)
-// Y-axis is flipped so Row 1 is at the BOTTOM and Row 7 at the TOP
-// (standard mathematical graph convention: y increases upward)
+// Scale: 80 units per column (x) and 80 units per row (y).
+// This keeps the outer rectangle at 320 × 480 units, matching the documented
+// rectangle-to-square transformation and the circle radius of 160 units.
 const SPACING_X = 80;
 const SPACING_Y = 80;
 const OFFSET_X = 150;  // A-column x-start
